@@ -54,17 +54,17 @@ def return_figures():
             mode = "number",
             value = conf2[0],
             title = {'text': "Active"},
-            domain = {'row': 0, 'column': 1}))
+            domain = {'row': 1, 'column': 0}))
     
     graph_one.add_trace(go.Indicator(
             mode = "delta",
             value = -conf3[0],
             title = {'text': "Deaths"},
-            domain = {'row': 0, 'column': 2}))
+            domain = {'row': 2, 'column': 0}))
 
     graph_one.update_layout(
             title=("Overview"),
-            grid = {'rows': 1, 'columns': 3, 'pattern': "independent"},
+            grid = {'rows': 3, 'columns': 3, 'pattern': "independent"},
             template = {'data' : {'indicator': [{
 
                 'mode' : "number+delta+gauge",
@@ -138,12 +138,49 @@ def return_figures():
                 xaxis = dict(title = 'Province', ),
                 yaxis = dict(title = 'Cases'),
                 )
+    
+    graph_five=[]
+    canada6 = canada4[['Province','Confirmed','Deaths','Active']]
+    graph_five = go.Figure(data=[go.Table(
+    header=dict(values=list(canada6.columns),
+                fill_color='paleturquoise',
+                align='left'),
+    cells=dict(values=[canada6.Province, canada6.Confirmed, canada6.Deaths, canada6.Active],
+               fill_color='lavender',
+               align='left'))])
+    graph_five.update_layout(title_text='Confirmed, Deaths and Active Cases Per Province') 
+    layout_five = dict(
+                xaxis = dict(title = 'Province', ),
+                yaxis = dict(title = 'Cases'),
+                )    
+    graph_six=[]
+    canada6 = canada3[['Date','Confirmed','Deaths','Active']]
+    canada6['Date'] = pd.to_datetime(canada6['Date'])
+    canada6['Date'] = canada6["Date"].dt.date
+    canada7 = canada6.groupby('Date').agg({'Confirmed':'sum','Deaths':'sum','Active':'sum'}).reset_index()
+    canada7 = canada7.sort_values(by=['Date'],ascending=False)
+    graph_six = go.Figure(data=[go.Table(
+    header=dict(values=list(canada7.columns),
+                fill_color='paleturquoise',
+                align='left'),
+    cells=dict(values=[canada7.Date, canada7.Confirmed, canada7.Deaths, canada7.Active],
+               fill_color='lavender',
+               align='left'))])
+    graph_six.update_layout(title_text='Confirmed, Deaths and Active Cases Per Day') 
+    layout_six = dict(
+                xaxis = dict(title = 'Province', ),
+                yaxis = dict(title = 'Cases'),
+                )                   
       # append all charts
     figures = []
-    figures.append(dict(data=graph_one, layout=layout_one))    
+    figures.append(dict(data=graph_one, layout=layout_one))
     figures.append(dict(data=graph_four, layout=layout_four))
-    figures.append(dict(data=graph_three, layout=layout_three))
+    figures.append(dict(data=graph_six, layout=layout_six))
+    figures.append(dict(data=graph_five, layout=layout_five))
     figures.append(dict(data=graph_two, layout=layout_two))
+    figures.append(dict(data=graph_three, layout=layout_three))
+    
+    
 
     return figures    
 
